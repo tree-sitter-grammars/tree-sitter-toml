@@ -1,9 +1,5 @@
-const { Charset } = require("regexp-util");
+/// <reference types="tree-sitter-cli/dsl" />
 
-const getInverseRegex = charset =>
-  new RegExp(`[^${charset.toString().slice(1, -1)}]`);
-
-const control_chars = new Charset([0x0, 0x1f], 0x7f);
 const newline = /\r?\n/;
 
 const decimal_integer = /[+-]?(0|[1-9](_?[0-9])*)/;
@@ -42,7 +38,7 @@ module.exports = grammar({
     comment: $ =>
       token(prec(-1, seq(
         "#",
-        repeat(getInverseRegex(control_chars.subtract("\t"))),
+        repeat(/[^\x00-\x08\x0a-\x1f\x7f]/)
       ))),
 
     table: $ =>
@@ -98,9 +94,7 @@ module.exports = grammar({
         repeat(
           choice(
             token.immediate(
-              repeat1(
-                getInverseRegex(control_chars.subtract("\t").union('"', "\\")),
-              ),
+              repeat1(/[^\x00-\x08\x0a-\x1f\x22\x5c\x7f]/)
             ),
             $.escape_sequence,
           ),
@@ -113,9 +107,7 @@ module.exports = grammar({
         repeat(
           choice(
             token.immediate(
-              repeat1(
-                getInverseRegex(control_chars.subtract("\t").union('"', "\\")),
-              ),
+              repeat1(/[^\x00-\x08\x0a-\x1f\x22\x5c\x7f]/)
             ),
             $._multiline_basic_string_content,
             token.immediate(newline),
@@ -133,7 +125,7 @@ module.exports = grammar({
         "'",
         optional(
           token.immediate(
-            repeat1(getInverseRegex(control_chars.union("'").subtract("\t"))),
+            repeat1(/[^\x00-\x08\x0a-\x1f\x27\x7f]/)
           ),
         ),
         token.immediate("'"),
@@ -144,7 +136,7 @@ module.exports = grammar({
         repeat(
           choice(
             token.immediate(
-              repeat1(getInverseRegex(control_chars.union("'").subtract("\t"))),
+              repeat1(/[^\x00-\x08\x0a-\x1f\x27\x7f]/)
             ),
             $._multiline_literal_string_content,
             token.immediate(newline),

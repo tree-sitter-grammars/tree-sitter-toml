@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - grammar.js
+      - src/**
+      - test/**
+      - bindings/**
+      - binding.gyp
+  pull_request:
+    paths:
+      - grammar.js
+      - src/**
+      - test/**
+      - bindings/**
+      - binding.gyp
+
+concurrency:
+  group: ${{github.workflow}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test parser
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up tree-sitter
+        uses: tree-sitter/setup-action/cli@v1
+      - name: Run tests
+        uses: tree-sitter/parser-test-action@v2
+        with:
+          test-rust: ${{runner.os == 'Linux'}}
+      - name: Clone test suite
+        uses: actions/checkout@v4
+        with:
+          repository: toml-lang/toml-test
+          path: examples/toml-test
+          sparse-checkout: tests/
+      - name: Parse test suite
+        id: test-suite
+        uses: tree-sitter/parse-action@v4
+        continue-on-error: true
+        with:
+          files: |
+            examples/toml-test/tests/valid/**/*.toml
+          invalid-files: |
+            examples/toml-test/tests/invalid/**/*.toml
+            !examples/toml-test/tests/invalid/array/extend-defined-aot.toml
+            !examples/toml-test/tests/invalid/array/extending-table.toml
+            !examples/toml-test/tests/invalid/array/tables-*.toml
+            !examples/toml-test/tests/invalid/*/feb-*.toml
+            !examples/toml-test/tests/invalid/*/y10k.toml
+            !examples/toml-test/tests/invalid/inline-table/duplicate-key-*.toml
+            !examples/toml-test/tests/invalid/inline-table/overwrite-*.toml
+            !examples/toml-test/tests/invalid/key/dotted-redefine-table-*.toml
+            !examples/toml-test/tests/invalid/key/duplicate-keys-*.toml
+            !examples/toml-test/tests/invalid/spec/inline-table-*.toml
+            !examples/toml-test/tests/invalid/spec/table-*.toml
+            !examples/toml-test/tests/invalid/string/bad-uni-esc-6.toml
+            !examples/toml-test/tests/invalid/string/*-out-of-range-unicode-escape-*.toml
+            !examples/toml-test/tests/invalid/table/append-*.toml
+            !examples/toml-test/tests/invalid/table/array-implicit.toml
+            !examples/toml-test/tests/invalid/table/duplicate*.toml
+            !examples/toml-test/tests/invalid/table/overwrite-*.toml
+            !examples/toml-test/tests/invalid/table/redefine-*.toml
+            !examples/toml-test/tests/invalid/table/super-twice.toml
+            # FIXME: it should be possible to parse these as errors
+            !examples/toml-test/tests/invalid/float/leading-zero-neg.toml
+            !examples/toml-test/tests/invalid/float/leading-zero-plus.toml
+            !examples/toml-test/tests/invalid/float/leading-zero.toml
+            !examples/toml-test/tests/invalid/float/us-before-point.toml
+            !examples/toml-test/tests/invalid/key/after-value.toml
+            !examples/toml-test/tests/invalid/key/no-eol.toml
+            !examples/toml-test/tests/invalid/spec/string-7-0.toml
+            !examples/toml-test/tests/invalid/string/bad-concat.toml
+            !examples/toml-test/tests/invalid/string/literal-multiline-quotes-1.toml
+            !examples/toml-test/tests/invalid/string/literal-multiline-quotes-2.toml
+            !examples/toml-test/tests/invalid/string/multiline-quotes-1.toml
+            !examples/toml-test/tests/invalid/string/text-after-string.toml
+      - name: Upload failure artifacts
+        uses: actions/upload-artifact@v4
+        if: steps.test-suite.outputs.failures != ''
+        with:
+          name: failures-${{matrix.os}}
+          path: ${{steps.test-suite.outputs.failures}}
+  fuzz:
+    name: Fuzz scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Check for scanner changes
+        id: scanner-check
+        run: |-
+          if git diff --quiet HEAD^ -- src/scanner.c; then
+            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
+          else
+            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Run fuzzer
+        uses: tree-sitter/fuzz-action@v4

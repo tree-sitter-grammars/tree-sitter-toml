@@ -2,13 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "TreeSitterToml",
+    name: "TreeSitterTOML",
     products: [
-        .library(name: "TreeSitterToml", targets: ["TreeSitterToml"]),
+        .library(name: "TreeSitterTOML", targets: ["TreeSitterTOML"]),
     ],
     dependencies: [],
     targets: [
-        .target(name: "TreeSitterToml",
+        .target(name: "TreeSitterTOML",
                 path: ".",
                 exclude: [
                     "Cargo.toml",
@@ -31,11 +31,10 @@ let package = Package(
                     ".github",
                     ".gitignore",
                     ".gitattributes",
-                    ".gitmodules",
                 ],
                 sources: [
                     "src/parser.c",
-                    // NOTE: if your language has an external scanner, add it here.
+                    "src/scanner.c",
                 ],
                 resources: [
                     .copy("queries")

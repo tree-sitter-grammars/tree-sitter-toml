@@ -1,68 +1,71 @@
 {
-  "name": "tree-sitter-toml",
-  "version": "0.5.1",
-  "description": "TOML grammar for tree-sitter",
-  "keywords": [
-    "parser",
-    "lexer"
-  ],
+  "name": "@tree-sitter-grammars/tree-sitter-toml",
+  "version": "0.6.0",
+  "license": "MIT",
+  "description": "YAML grammar for tree-sitter",
+  "repository": "github:tree-sitter-grammars/tree-sitter-toml",
   "main": "bindings/node",
   "types": "bindings/node",
-  "repository": "https://github.com/ikatyang/tree-sitter-toml",
-  "homepage": "https://github.com/ikatyang/tree-sitter-toml#readme",
   "author": {
     "name": "Ika",
     "email": "ikatyang@gmail.com",
     "url": "https://github.com/ikatyang"
   },
-  "license": "MIT",
-  "scripts": {
-    "test": "yarn tree-sitter test",
-    "prepack": "yarn tree-sitter generate",
-    "release": "standard-version --commit-all",
-    "tree-sitter": "./tree-sitter/target/release/tree-sitter",
-    "install": "node-gyp-build",
-    "prebuildify": "prebuildify --napi --strip"
-  },
-  "standard-version": {
-    "preset": "angular",
-    "scripts": {
-      "postbump": "rm -r docs && node scripts/generate-playground.js && git add docs"
+  "maintainers": [
+    {
+      "name": "Amaan Qureshi",
+      "email": "amaanq12@gmail.com"
     }
-  },
+  ],
+  "keywords": [
+    "incremental",
+    "parsing",
+    "tree-sitter",
+    "toml"
+  ],
+  "files": [
+    "grammar.js",
+    "binding.gyp",
+    "prebuilds/**",
+    "bindings/node/*",
+    "queries/*",
+    "src/**",
+    "schema/**"
+  ],
   "dependencies": {
-    "node-addon-api": "^7.1.0",
-    "node-gyp-build": "^4.8.0"
+    "node-addon-api": "^8.0.0",
+    "node-gyp-build": "^4.8.0",
+    "regexp-util": "^2.0.0"
+  },
+  "devDependencies": {
+    "prebuildify": "^6.0.1",
+    "tree-sitter-cli": "^0.22.5"
   },
   "peerDependencies": {
-    "tree-sitter": "^0.21.0"
+    "tree-sitter": "^0.21.1"
   },
   "peerDependenciesMeta": {
     "tree_sitter": {
       "optional": true
     }
   },
-  "devDependencies": {
-    "regexp-util": "1.2.2",
-    "standard-version": "7.0.0",
-    "prebuildify": "^6.0.0"
+  "scripts": {
+    "build": "tree-sitter generate --no-bindings",
+    "postbuild": "npm run --prefix schema/core build",
+    "test": "tree-sitter test",
+    "install": "node-gyp-build",
+    "prebuildify": "prebuildify --napi --strip"
   },
-  "files": [
-    "/src/",
-    "/queries/",
-    "/bindings/node/",
-    "/binding.gyp",
-    "/grammar.js"
-  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "tree-sitter": [
     {
-      "scope": "source.toml",
+      "scope": "text.toml",
       "file-types": [
         "toml"
       ],
-      "highlights": [
-        "queries/highlights.scm"
-      ],
+      "highlights": "queries/highlights.scm",
       "injection-regex": "^toml$"
     }
   ]

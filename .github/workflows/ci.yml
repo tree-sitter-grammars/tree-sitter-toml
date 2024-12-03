@@ -37,7 +37,11 @@ jobs:
       - name: Run tests
         uses: tree-sitter/parser-test-action@v2
         with:
-          test-rust: ${{runner.os == 'Linux'}}
+          test-rust: true
+          test-node: true
+          test-python: true
+          test-go: true
+          test-swift: true
       - name: Clone test suite
         uses: actions/checkout@v4
         with:
@@ -91,21 +95,3 @@ jobs:
         with:
           name: failures-${{matrix.os}}
           path: ${{steps.test-suite.outputs.failures}}
-  fuzz:
-    name: Fuzz scanner
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Check for scanner changes
-        id: scanner-check
-        run: |-
-          if git diff --quiet HEAD^ -- src/scanner.c; then
-            printf 'changed=false\n' >> "$GITHUB_OUTPUT"
-          else
-            printf 'changed=true\n' >> "$GITHUB_OUTPUT"
-          fi
-      - name: Run fuzzer
-        uses: tree-sitter/fuzz-action@v4

@@ -17,7 +17,7 @@ const rfc3339_time = /([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)([.][0-9]+)
 const rfc3339_offset = /([zZ])|([+-]([01][0-9]|2[0-3]):[0-5][0-9])/;
 
 module.exports = grammar({
-  name: "toml",
+  name: 'toml',
 
   externals: $ => [
     $._line_ending_or_eof,
@@ -38,33 +38,33 @@ module.exports = grammar({
 
     comment: $ =>
       token(prec(-1, seq(
-        "#",
-        repeat(/[^\x00-\x08\x0a-\x1f\x7f]/)
+        '#',
+        repeat(/[^\x00-\x08\x0a-\x1f\x7f]/),
       ))),
 
     table: $ =>
       seq(
-        "[",
+        '[',
         choice($.dotted_key, $._key),
-        "]",
+        ']',
         $._line_ending_or_eof,
         repeat(choice($.pair, newline)),
       ),
 
     table_array_element: $ =>
       seq(
-        "[[",
+        '[[',
         choice($.dotted_key, $._key),
-        "]]",
+        ']]',
         $._line_ending_or_eof,
         repeat(choice($.pair, newline)),
       ),
 
     pair: $ => seq($._inline_pair, $._line_ending_or_eof),
-    _inline_pair: $ => seq(choice($.dotted_key, $._key), "=", $._inline_value),
+    _inline_pair: $ => seq(choice($.dotted_key, $._key), '=', $._inline_value),
 
     _key: $ => choice($.bare_key, $.quoted_key),
-    dotted_key: $ => seq(choice($.dotted_key, $._key), ".", $._key),
+    dotted_key: $ => seq(choice($.dotted_key, $._key), '.', $._key),
     bare_key: $ => /[A-Za-z0-9_-]+/,
     quoted_key: $ => choice($._basic_string, $._literal_string),
 
@@ -95,7 +95,7 @@ module.exports = grammar({
         repeat(
           choice(
             token.immediate(
-              repeat1(/[^\x00-\x08\x0a-\x1f\x22\x5c\x7f]/)
+              repeat1(/[^\x00-\x08\x0a-\x1f\x22\x5c\x7f]/),
             ),
             $.escape_sequence,
           ),
@@ -108,7 +108,7 @@ module.exports = grammar({
         repeat(
           choice(
             token.immediate(
-              repeat1(/[^\x00-\x08\x0a-\x1f\x22\x5c\x7f]/)
+              repeat1(/[^\x00-\x08\x0a-\x1f\x22\x5c\x7f]/),
             ),
             $._multiline_basic_string_content,
             token.immediate(newline),
@@ -123,21 +123,21 @@ module.exports = grammar({
     _escape_line_ending: $ => token.immediate(seq(/\\/, newline)),
     _literal_string: $ =>
       seq(
-        "'",
+        '\'',
         optional(
           token.immediate(
-            repeat1(/[^\x00-\x08\x0a-\x1f\x27\x7f]/)
+            repeat1(/[^\x00-\x08\x0a-\x1f\x27\x7f]/),
           ),
         ),
-        token.immediate("'"),
+        token.immediate('\''),
       ),
     _multiline_literal_string: $ =>
       seq(
-        "'''",
+        '\'\'\'',
         repeat(
           choice(
             token.immediate(
-              repeat1(/[^\x00-\x08\x0a-\x1f\x27\x7f]/)
+              repeat1(/[^\x00-\x08\x0a-\x1f\x27\x7f]/),
             ),
             $._multiline_literal_string_content,
             token.immediate(newline),
@@ -179,29 +179,29 @@ module.exports = grammar({
 
     array: $ =>
       seq(
-        "[",
+        '[',
         repeat(newline),
         optional(
           seq(
             $._inline_value,
             repeat(newline),
-            repeat(seq(",", repeat(newline), $._inline_value, repeat(newline))),
-            optional(seq(",", repeat(newline))),
+            repeat(seq(',', repeat(newline), $._inline_value, repeat(newline))),
+            optional(seq(',', repeat(newline))),
           ),
         ),
-        "]",
+        ']',
       ),
 
     inline_table: $ =>
       seq(
-        "{",
+        '{',
         optional(
           seq(
             alias($._inline_pair, $.pair),
-            repeat(seq(",", alias($._inline_pair, $.pair))),
+            repeat(seq(',', alias($._inline_pair, $.pair))),
           ),
         ),
-        "}",
+        '}',
       ),
   },
 });

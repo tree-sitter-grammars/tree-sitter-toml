@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(tree-sitter-toml
-        VERSION "0.6.0"
+        VERSION "0.7.0"
         DESCRIPTION "TOML grammar for tree-sitter"
         HOMEPAGE_URL "https://github.com/tree-sitter-grammars/tree-sitter-toml"
         LANGUAGES C)

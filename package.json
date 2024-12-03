@@ -1,6 +1,6 @@
 {
   "name": "@tree-sitter-grammars/tree-sitter-toml",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "TOML grammar for tree-sitter",
   "repository": "https://github.com/tree-sitter-grammars/tree-sitter-toml",
   "license": "MIT",

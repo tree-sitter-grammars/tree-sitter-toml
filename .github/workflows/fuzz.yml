@@ -1,4 +1,4 @@
-name: Fuzz Parser
+name: Fuzz parser
 
 on:
   push:
@@ -11,6 +11,7 @@ on:
 
 jobs:
   fuzz:
+    name: Parser fuzzing
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

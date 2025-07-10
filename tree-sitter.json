@@ -1,16 +1,17 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
   "grammars": [
     {
       "name": "toml",
+      "title": "TOML",
       "camelcase": "TOML",
       "scope": "source.toml",
+      "class-name": "TreeSitterTOML",
+      "injection-regex": "^toml$",
+      "highlights": "queries/highlights.scm",
       "file-types": [
         "toml"
-      ],
-      "highlights": [
-        "queries/highlights.scm"
-      ],
-      "injection-regex": "^toml$"
+      ]
     }
   ],
   "metadata": {
@@ -20,8 +21,7 @@
     "authors": [
       {
         "name": "Ika",
-        "email": "ikatyang@gmail.com",
-        "url": "https://github.com/ikatyang"
+        "email": "ikatyang@gmail.com"
       },
       {
         "name": "Amaan Qureshi",
@@ -31,13 +31,5 @@
     "links": {
       "repository": "https://github.com/tree-sitter-grammars/tree-sitter-toml"
     }
-  },
-  "bindings": {
-    "c": true,
-    "go": true,
-    "node": true,
-    "python": true,
-    "rust": true,
-    "swift": true
   }
 }

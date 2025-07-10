@@ -28,20 +28,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-14]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Set up tree-sitter
-        uses: tree-sitter/setup-action/cli@v1
-      - name: Run tests
+        uses: tree-sitter/setup-action/cli@v2
+      - name: Run parser and binding tests
         uses: tree-sitter/parser-test-action@v2
         with:
+          generate: false
           test-rust: true
-          test-node: true
-          test-python: true
-          test-go: true
-          test-swift: true
       - name: Clone test suite
         uses: actions/checkout@v4
         with:
@@ -51,10 +48,20 @@ jobs:
       - name: Parse test suite
         id: test-suite
         uses: tree-sitter/parse-action@v4
-        continue-on-error: true
         with:
           files: |
             examples/toml-test/tests/valid/**/*.toml
+            # FIXME: these should not have errors
+            !examples/toml-test/tests/valid/datetime/no-seconds.toml
+            !examples/toml-test/tests/valid/inline-table/newline-comment.toml
+            !examples/toml-test/tests/valid/inline-table/newline.toml
+            !examples/toml-test/tests/valid/spec-1.1.0/common-12.toml
+            !examples/toml-test/tests/valid/spec-1.1.0/common-47.toml
+            !examples/toml-test/tests/valid/string/ends-in-whitespace-escape.toml
+            !examples/toml-test/tests/valid/string/escape-esc.toml
+            !examples/toml-test/tests/valid/string/hex-escape.toml
+            !examples/toml-test/tests/valid/string/multiline-empty.toml
+            !examples/toml-test/tests/valid/string/multiline.toml
           invalid-files: |
             examples/toml-test/tests/invalid/**/*.toml
             !examples/toml-test/tests/invalid/array/extend-defined-aot.toml
@@ -91,7 +98,7 @@ jobs:
             !examples/toml-test/tests/invalid/string/text-after-string.toml
       - name: Upload failure artifacts
         uses: actions/upload-artifact@v4
-        if: steps.test-suite.outputs.failures != ''
+        if: "!cancelled() && steps.test-suite.outcome == 'failure'"
         with:
           name: failures-${{matrix.os}}
           path: ${{steps.test-suite.outputs.failures}}

@@ -6,8 +6,7 @@
   "license": "MIT",
   "author": {
     "name": "Ika",
-    "email": "ikatyang@gmail.com",
-    "url": "https://github.com/ikatyang"
+    "email": "ikatyang@gmail.com"
   },
   "maintainers": [
     {
@@ -34,28 +33,26 @@
     "*.wasm"
   ],
   "dependencies": {
-    "node-addon-api": "^8.3.0",
+    "node-addon-api": "^8.3.1",
     "node-gyp-build": "^4.8.4"
   },
   "devDependencies": {
-    "eslint": "^9.16.0",
+    "eslint": "^9.30.1",
     "eslint-config-treesitter": "^1.0.2",
     "prebuildify": "^6.0.1",
-    "tree-sitter-cli": "^0.24.4"
+    "tree-sitter-cli": "^0.25.6"
   },
   "peerDependencies": {
-    "tree-sitter": "^0.22.1"
+    "tree-sitter": "^0.22.4"
   },
   "peerDependenciesMeta": {
     "tree-sitter": {
       "optional": true
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "install": "node-gyp-build",
+    "lint": "eslint grammar.js",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
     "test": "node --test bindings/node/*_test.js"

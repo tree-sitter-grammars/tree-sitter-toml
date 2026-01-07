@@ -290,13 +290,21 @@ not3 = -nan
 Dates and Times: offset datetime
 ================================
 
-odt1 = 1979-05-27T07:32:00Z
-odt2 = 1979-05-27T00:32:00-07:00
-odt3 = 1979-05-27T00:32:00.999999-07:00
+odt1 = 1979-05-27T07:32Z
+odt2 = 1979-05-27T07:32:00Z
+odt3 = 1979-05-27T00:32-07:00
+odt4 = 1979-05-27T00:32:00-07:00
+odt5 = 1979-05-27T00:32:00.999999-07:00
 
 ---
 
 (document
+  (pair
+    (bare_key)
+    (offset_date_time))
+  (pair
+    (bare_key)
+    (offset_date_time))
   (pair
     (bare_key)
     (offset_date_time))
@@ -311,12 +319,16 @@ odt3 = 1979-05-27T00:32:00.999999-07:00
 Dates and Times: local datetime
 ===============================
 
-ldt1 = 1979-05-27T07:32:00
-ldt2 = 1979-05-27T00:32:00.999999
+ldt1 = 1979-05-27T07:32
+ldt2 = 1979-05-27T07:32:00
+ldt3 = 1979-05-27T00:32:00.999999
 
 ---
 
 (document
+  (pair
+    (bare_key)
+    (local_date_time))
   (pair
     (bare_key)
     (local_date_time))
@@ -341,8 +353,9 @@ ld1 = 1979-05-27
 Dates and Times: local time
 ===========================
 
-lt1 = 07:32:00
-lt2 = 00:32:00.999999
+lt1 = 07:32
+lt2 = 07:32:00
+lt3 = 00:32:00.999999
 
 ---
 
@@ -352,4 +365,34 @@ lt2 = 00:32:00.999999
     (local_time))
   (pair
     (bare_key)
+    (local_time))
+  (pair
+    (bare_key)
     (local_time)))
+
+=============
+Inline Tables
+=============
+
+tbl = {
+    key      = "a string",
+    moar-tbl =  {
+        key = 1,
+    },
+}
+
+---
+
+(document
+  (pair
+    (bare_key)
+    (inline_table
+      (pair
+        (bare_key)
+        (string))
+      (pair
+        (bare_key)
+        (inline_table 
+          (pair 
+            (bare_key)
+            (integer)))))))

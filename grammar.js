@@ -13,7 +13,7 @@ const float_exponent_part = seq(/[eE]/, decimal_integer_in_float_exponent_part);
 
 const rfc3339_date = /([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
 const rfc3339_delimiter = /[ tT]/;
-const rfc3339_time = /([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)([.][0-9]+)?/;
+const rfc3339_time = /([01][0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]|60)([.][0-9]+)?)?/;
 const rfc3339_offset = /([zZ])|([+-]([01][0-9]|2[0-3]):[0-5][0-9])/;
 
 module.exports = grammar({
@@ -119,7 +119,7 @@ module.exports = grammar({
         $._multiline_basic_string_end,
       ),
     escape_sequence: $ =>
-      token.immediate(/\\([btnfr"\\]|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})/),
+      token.immediate(/\\(["\\befnrt]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})/),
     _escape_line_ending: $ => token.immediate(seq(/\\/, newline)),
     _literal_string: $ =>
       seq(
@@ -195,10 +195,13 @@ module.exports = grammar({
     inline_table: $ =>
       seq(
         '{',
+        repeat(newline),
         optional(
           seq(
             alias($._inline_pair, $.pair),
-            repeat(seq(',', alias($._inline_pair, $.pair))),
+            repeat(newline),
+            repeat(seq(',', repeat(newline), alias($._inline_pair, $.pair), repeat(newline))),
+            optional(seq(',', repeat(newline))),
           ),
         ),
         '}',
